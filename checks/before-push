@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# before-push — this project's fast checks, which the framework's pre-push
+# hook, an installed copy of checks/pre-push, runs at the root of the working
+# tree for each branch pushed, and each tag on a commit no remote branch
+# holds, with that ref's line on its input. A check that fails refuses the
+# push. A check belongs here when it runs in seconds, offline; a slower one
+# runs in CI or on a schedule, as the automating-checks skill says.
+#
+# checks/districts needs bash, checks/links Python 3, and checks/secrets
+# gitleaks and git, in the versions it names. Run by hand, this needs the
+# hook's line on its input, as the skill's "Outside a push" gives.
+#
+# Time limit: 60 seconds
+
+set -e
+refs="$(cat)"
+checks/districts
+checks/links
+if [ -n "$refs" ]; then printf '%s\n' "$refs"; fi | checks/secrets

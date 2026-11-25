@@ -24,4 +24,5 @@ is fixed now.>
 
 ## Size
 
-<S, M or L, and the trigger that sets it. Most bugs are small.>
+<S, M or L, and the trigger that sets it. Most bugs are small. In a
+project with districts, the districts it touches.>

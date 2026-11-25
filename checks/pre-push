@@ -1,0 +1,169 @@
+#!/bin/sh
+#
+# pre-push — refuses a push that changes or deletes main on the remote, then
+# runs the project's fast checks, checks/before-push, for each branch the
+# push carries, and each tag on a commit no remote branch holds. Changes
+# reach main through pull requests; creating main on a remote that has none
+# is allowed, as a new repository starts that way.
+#
+# setup-project.sh copies this file into a project as checks/pre-push,
+# tracked. It installs a copy of that as .git/hooks/pre-push.framework,
+# which a pre-push hook of the project's own runs first, as the
+# automating-checks skill says, and, unless the project has a hook of its
+# own, as .git/hooks/pre-push, which git
+# runs. It knows a copy by this line: framework pre-push hook.
+#
+# checks/before-push runs in the working tree, which must hold exactly the
+# pushed commit: that commit checked out, with no uncommitted change to a
+# tracked file. Otherwise the push is refused. It runs without the
+# environment git gives hooks, so that its own git commands act on the
+# repository they name. It gets git's arguments, the remote's name and
+# address, and on its input the line git gives this hook for that ref. Its
+# limit is a line such as "# Time limit: 60 seconds", 60 seconds when it has
+# none. Past it, or when the push is interrupted, the checks and every
+# process they started are stopped, and the push is refused. A process that
+# leaves their process tree, as a doubly forked one does, isn't stopped.
+#
+# A deleted ref, a tag on a commit a remote branch already holds, and a
+# commit without checks/before-push aren't checked. When the commit pushed
+# lacks checks/before-push, but has a checks/ folder, or the remote's commit
+# or a remote's main has checks/before-push, the push says so.
+
+refs="$(cat)"
+
+printf '%s\n' "$refs" | while read -r local_ref local_sha remote_ref remote_sha; do
+  [ "$remote_ref" = "refs/heads/main" ] || continue
+  case "$remote_sha" in
+    *[!0]*)
+      echo "pre-push: refused, this push changes main on the remote." >&2
+      echo "Changes reach main through a pull request." >&2
+      exit 1
+      ;;
+  esac
+done || exit 1
+
+# Prints a process and all its descendants.
+tree() {
+  ps -A -o pid= -o ppid= | awk -v root="$1" '
+    { parent[$1] = $2 }
+    END {
+      found[root] = 1
+      for (grew = 1; grew; ) {
+        grew = 0
+        for (p in parent)
+          if (!(p in found) && (parent[p] in found)) { found[p] = 1; grew = 1 }
+      }
+      for (p in found) print p
+    }'
+}
+
+# Stops a process and its descendants: TERM, then KILL for any left after a
+# second.
+end() {
+  victims="$(tree "$1")"
+  kill -TERM $victims 2>/dev/null
+  sleep 1
+  kill -KILL $victims 2>/dev/null
+}
+
+checks=""
+watcher=""
+state="$(mktemp -d 2>/dev/null)" || state=""
+trap '[ -z "$state" ] || rm -rf "$state"' EXIT
+stop() {
+  [ -z "$watcher" ] || kill -KILL $(tree "$watcher") 2>/dev/null
+  [ -z "$checks" ] || end "$checks"
+}
+trap 'stop; echo "pre-push: refused, the push was interrupted, and the checks were stopped." >&2; exit 1' INT TERM HUP
+
+root="$(git rev-parse --show-toplevel)"
+head="$(git rev-parse -q --verify HEAD)"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  case "$local_sha" in *[!0]*) ;; *) continue ;; esac
+  # An annotated tag names a tag object; its commit is what is checked.
+  commit="$(git rev-parse -q --verify "$local_sha^{commit}")" || continue
+  case "$remote_ref" in
+    refs/heads/*) ;;
+    refs/tags/*)
+      [ -z "$(git branch -r --contains "$commit" 2>/dev/null)" ] || continue
+      ;;
+    *) continue ;;
+  esac
+  name="${local_ref#refs/*/}"
+
+  if ! git cat-file -e "$commit:checks/before-push" 2>/dev/null; then
+    had=""
+    case "$remote_sha" in
+      *[!0]*) git cat-file -e "$remote_sha:checks/before-push" 2>/dev/null && had=yes ;;
+    esac
+    for main in $(git for-each-ref --format='%(refname)' 'refs/remotes/*/main'); do
+      git cat-file -e "$main:checks/before-push" 2>/dev/null && had=yes
+    done
+    if [ -n "$had" ] || git cat-file -e "$commit:checks" 2>/dev/null; then
+      echo "pre-push: $name has no checks/before-push, so it was pushed" \
+        "unchecked." >&2
+    fi
+    continue
+  fi
+  if [ "$commit" != "$head" ]; then
+    echo "pre-push: refused, the commit $name points to isn't the one" \
+      "checked out here, so its checks can't run on it. Push it from where" \
+      "it is checked out." >&2
+    exit 1
+  fi
+  if ! git diff --quiet HEAD --; then
+    echo "pre-push: refused, the working tree has uncommitted changes, so" \
+      "the checks wouldn't run on what is pushed. Commit them, or set them" \
+      "aside." >&2
+    exit 1
+  fi
+  if [ -z "$state" ]; then
+    echo "pre-push: refused, no temporary folder could be made, so the" \
+      "checks' time limit couldn't be kept." >&2
+    exit 1
+  fi
+  limit="$(sed -n 's/^# Time limit: \([0-9][0-9]*\) seconds.*/\1/p' "$root/checks/before-push" | head -n 1)"
+  limit="${limit:-60}"
+
+  # The checks and the watcher ignore the terminal's interrupt, which would
+  # break their process tree apart; the hook's own trap stops them whole.
+  (
+    trap '' INT HUP
+    cd "$root" || exit 1
+    unset $(git rev-parse --local-env-vars)
+    exec checks/before-push "$@"
+  ) <<LINE &
+$local_ref $local_sha $remote_ref $remote_sha
+LINE
+  checks=$!
+  # Past the limit, the watcher marks that it fired before stopping the
+  # checks, so that the push is refused whatever they returned.
+  (
+    trap '' INT HUP
+    sleep "$limit" < /dev/null > /dev/null 2>&1
+    kill -0 "$checks" 2>/dev/null || exit 0
+    : > "$state/fired"
+    end "$checks"
+    echo "pre-push: refused, checks/before-push took over $limit seconds" \
+      "and was stopped. Make the slow check faster." >&2
+  ) < /dev/null > /dev/null &
+  watcher=$!
+  wait "$checks"
+  status=$?
+  if [ -e "$state/fired" ]; then
+    wait "$watcher"
+    exit 1
+  fi
+  kill -KILL $(tree "$watcher") 2>/dev/null
+  wait "$watcher" 2>/dev/null
+  checks=""
+  watcher=""
+  if [ "$status" -ne 0 ]; then
+    echo "pre-push: refused, checks/before-push failed on $name." >&2
+    exit 1
+  fi
+done <<REFS
+$refs
+REFS
+exit 0

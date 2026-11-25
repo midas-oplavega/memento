@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+#
+# districts — checks a project's districts, as the core rules define them:
+# every tracked file is in a district, the map in the root .gitattributes and
+# the list in AGENTS.md name the same districts, and nothing else sets
+# `district`. It does nothing in a project whose AGENTS.md lists no districts.
+# Prints what is wrong, and exits 1 when anything is.
+#
+# The automating-checks skill says where it runs.
+
+set -euo pipefail
+cd "$(git rev-parse --show-toplevel)"
+[ -f AGENTS.md ] || exit 0
+
+# A line that sets, unsets or clears the district attribute, comments aside.
+sets='^[^#]*[[:space:]][-!]?district([=[:space:]]|$)'
+
+# The list is read as setup-project.sh reads it: the entries of the
+# "## Districts" section, fenced blocks skipped.
+listed="$(awk '
+  /^[ \t]*```/ { fenced = !fenced; next }
+  fenced { next }
+  /^#+ / { if (inside) exit; inside = /^## Districts[ \t]*$/; next }
+  inside && /^- `[^`]+`: / { sub(/^- `/, ""); sub(/`.*/, ""); print }
+' AGENTS.md | sort -u)"
+[ -n "$listed" ] || exit 0
+
+failed=0
+
+if [ ! -f .gitattributes ]; then
+  echo "districts: AGENTS.md lists districts, but there is no .gitattributes"
+  exit 1
+fi
+
+unassigned="$(git ls-files | git check-attr --stdin district |
+  awk -F': ' '$3 == "unassigned" || $3 == "unspecified" || $3 == "unset" { print $1 }')"
+if [ -n "$unassigned" ]; then
+  echo "districts: in no district:"
+  sed 's/^/- /' <<<"$unassigned"
+  failed=1
+fi
+
+mapped="$(awk '/^[[:space:]]*#/ { next } {
+  for (i = 2; i <= NF; i++)
+    if ($i ~ /^district=/) { sub(/^district=/, "", $i); print $i }
+}' .gitattributes | grep -vx unassigned | sort -u || true)"
+if [ "$mapped" != "$listed" ]; then
+  echo "districts: the map and the list differ:"
+  comm -23 <(echo "$mapped") <(echo "$listed") | grep . | sed 's/^/- in the map only: /' || true
+  comm -13 <(echo "$mapped") <(echo "$listed") | grep . | sed 's/^/- in the list only: /' || true
+  failed=1
+fi
+
+elsewhere="$(git ls-files --cached --others --exclude-standard -- \
+  '*.gitattributes' ':!:.gitattributes' |
+  while IFS= read -r file; do grep -lE "$sets" "$file" || true; done)"
+info="$(git rev-parse --git-path info/attributes)"
+if [ -f "$info" ] && grep -qE "$sets" "$info"; then
+  elsewhere="${elsewhere:+$elsewhere
+}$info"
+fi
+if [ -n "$elsewhere" ]; then
+  echo "districts: sets district outside the root .gitattributes:"
+  sed 's/^/- /' <<<"$elsewhere"
+  failed=1
+fi
+
+exit "$failed"

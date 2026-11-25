@@ -45,6 +45,18 @@ The design leaves room for a later cloud release, which is not scheduled. It
 would be a separate, optional build that adds an account, sync between your
 own devices, a website and splits shared with friends.
 
+## Documents
+
+- [Architecture decisions](docs/adr/): each choice that shapes the app, with
+  its reasons.
+- [AGENTS.md](AGENTS.md): the rules for agents working on Memento.
+
+## Help
+
+Questions and ideas go in this repository's
+[issues](https://github.com/midas-oplavega/memento/issues). Never post real
+bank messages or account details there.
+
 ## Licence
 
 AGPL-3.0-or-later. Copyright (C) 2026 Midas Oplavega. See [LICENSE](LICENSE).

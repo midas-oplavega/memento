@@ -8,3 +8,5 @@ more.
 Names of these kinds stay private, as `securing-a-product` says: the
 owner's other private repositories and projects, and other people's names
 and accounts.
+
+Framework version: 0.6.0

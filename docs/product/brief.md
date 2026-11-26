@@ -5,13 +5,14 @@ for people in India whose money moves through several bank accounts, cards
 and UPI. It records each payment in and out from the bank's SMS and email
 alerts as it arrives, asks what the payment was for while the user still
 remembers, splits shared expenses with friends, and shows spending against a
-plan of where the money should go. Everything stays on the phone. The Indian
-apps that capture payments automatically send the data to their own servers
-and are paid for by loans, cards, investing or subscriptions; the private
-budgeting apps make the user type each payment in; and the few open source
-apps that read Indian bank alerts on the phone are weeks old, and none of
-them describes a prompt at the moment of spending or splitting a bill with
-friends. Its first user is its owner, who builds it for their own money.
+plan of where the money should go. In its local-only build, everything stays
+on the phone. Of the more than 20 products surveyed, the established Indian
+apps that capture payments automatically keep the data on their own
+servers; none describes a prompt at the moment of spending; and the only
+one that both captures automatically and splits bills with friends is
+closed source, paid, and declares that it collects SMS. The nearest open
+source apps appeared in October 2026. Its first user is its owner, who
+builds it for their own money.
 
 ## Problem
 
@@ -60,16 +61,16 @@ It is not for:
   ([ADR 1](../adr/0001-flutter-with-a-pure-dart-core.md)), so an iPhone
   version relies on email alerts, statements and typed entries, and comes
   after Android.
-- **People outside India.** The alerts it reads, and the rules it works
-  within, are Indian banks'.
-- **Businesses, bookkeeping, and tracking investments or net worth.**
+- **People outside India, at first.** The alerts it reads, and the rules it
+  works within, are Indian banks'.
 - **Anyone who wants their bank linked to the app, or the app to make
   payments.**
 
 ## What exists already
 
 The [survey](../research/existing-products.md) read more than 20 products
-and projects on 2026-11-25. None meets the need in full.
+and projects on 2026-11-25. Of those whose features it could check, none
+meets the need in full.
 
 - **Indian apps that capture automatically.** axio (formerly Walnut) reads
   bank SMS; Fold, Jupiter and CRED connect through the Account Aggregator
@@ -84,6 +85,11 @@ and projects on 2026-11-25. None meets the need in full.
   notifications and splits group bills, but is paid by subscription, and
   its Play declaration says it collects SMS for analytics. Both are closed
   source.
+- **Small private trackers on Google Play.** PaisaSync, Vrid, TrakFi and
+  AuraSpend are Indian SMS trackers whose listings say the data stays on the
+  phone, and PaisaSync declares that it collects no data. What they do
+  beyond their listings, such as splitting or a prompt at the moment of
+  spending, was not checked.
 - **Splitting apps.** Splitwise, Splid and Tricount handle groups, balances
   and settling up well, but every expense is typed in, and they keep no
   budget.
@@ -183,8 +189,8 @@ complies with a rule.
 
 ### Google Play: SMS capture
 
-Only the default SMS app may read SMS, unless Google grants a temporary
-exception. The one that fits Memento is "SMS-based money management", "For
+Only the default SMS, phone or assistant app may ask for SMS permissions,
+unless Google grants a temporary exception. The one that fits Memento is "SMS-based money management", "For
 example, apps that track and manage budget", which covers READ_SMS and
 RECEIVE_SMS and is "Subject to Google Play review and approval". It is asked
 for with a Permissions Declaration Form and a demo video, and its review
@@ -221,9 +227,11 @@ organization account, which needs a D-U-N-S number, is required for
 investment funds, cryptocurrency software wallets, and cryptocurrency
 exchanges"
 ([store rules](../research/store-and-platform-rules.md#4-google-play-publishing-as-an-individual)).
-An app installed from outside Google Play will need a verified developer
-once Android's developer verification reaches India, due "globally ... in
-2027"; apps on Google Play are registered automatically
+Once Android's developer verification reaches India, due "globally ... in
+2027", an app installed from outside Google Play needs a registered
+developer, unless it is installed over ADB or the user turns on Android's
+advanced flow for unverified apps. Google Play registers most apps
+automatically
 ([store rules](../research/store-and-platform-rules.md#5-android-developer-verification)).
 
 **Open:** whether Google counts a tracker that moves no money as a financial
@@ -231,9 +239,10 @@ product or service: the second risk below.
 
 ### Email providers: email capture
 
-- **Gmail over IMAP** with an app password needs 2-Step Verification, and
-  isn't available to work or school accounts, to security-key-only 2-Step
-  Verification or to Advanced Protection. Google revokes app passwords when
+- **Gmail over IMAP** with an app password needs 2-Step Verification.
+  Google gives work or school accounts, security-key-only 2-Step
+  Verification and Advanced Protection as reasons the option may be
+  missing. Google revokes app passwords when
   the account password changes and says they "aren't recommended"; its
   pages announce no removal
   ([store rules](../research/store-and-platform-rules.md#7-google-app-passwords-email-capture-first-route)).
@@ -287,7 +296,9 @@ force about May 2027
   ₹500"; at or below that, each bank decides. They must send "email alerts
   for all EBTs, wherever email address is provided by the customer"
   ([Indian law](../research/indian-law.md#4-rbi-banks-sms-alerts-for-electronic-transactions)).
-  Email is the source the rules keep complete.
+  Email is the source the rules keep complete. Other kinds of bank, such as
+  small finance and co-operative banks, have rules of their own, which were
+  not read.
 - **SMS sender headers.** Commercial SMS come only from headers registered
   with the telecom operators, suffixed "-T" for transactional, "-S" for
   service, "-P" for promotional and "-G" for government messages. The
@@ -308,14 +319,22 @@ the owner's decision ([licences](../research/licences.md)):
   Apple's App Store terms as incompatible with every version of the GPL and
   AGPL, and a post on its blog says the same of the LGPL, so code from
   others under them would tie an iPhone release to its authors'
-  permission. The owner's own code is theirs to license.
+  permission.
 
 What Memento builds on fits: Flutter is BSD-3-Clause, drift is MIT, and
 SQLite is in the public domain
 ([licences](../research/licences.md#2-licences-of-flutter-drift-and-sqlite)).
 
-**Open:** whether MPL-2.0 code can ship through the App Store; Apple's
-current terms were not read.
+**Open:**
+- Whether Memento's own AGPL code can ship through the App Store, with a
+  permission its sole author adds to the licence. No FSF source read says
+  so.
+- Whether it can ship through Google Play once it has other authors. A 2012
+  post on the FSF's blog says Google Play's terms "are incompatible with any
+  copyleft license if the project has many copyright holders". This bears
+  on accepting contributions.
+- Whether MPL-2.0 code can ship through the App Store. Apple's and Google's
+  current terms were not read.
 
 ### Security
 
@@ -348,18 +367,19 @@ split. The change that adds it sets their fields, and updates this table.
 Riskiest first, each with the cheapest way to check it.
 
 1. **Google grants the SMS exception.** If it doesn't, the Play version
-   can't read SMS, and capture rests on email, statements and typing. axio
-   describes itself on Google Play as "an SMS-based money management app",
-   so the category exists there; whether Memento is granted it, only its
-   declaration settles. Check: submit the Permissions Declaration Form with
+   can't read SMS, and capture rests on email, statements and typing.
+   Several Indian SMS trackers are on Google Play: axio, which calls itself
+   "an SMS-based money management app" and also uses the SMS permission
+   for loan fraud checks, and small ones such as PaisaSync. Whether Memento is granted the exception,
+   only its declaration settles. Check: submit the Permissions Declaration Form with
    the first closed-test build, weeks before a public release.
 2. **An individual may publish it.** If Google counts a tracker as a
    "financial product or service", Google Play needs an organization
    account with a D-U-N-S number, and Apple's 5.1.1(ix) asks the same of
    the iPhone version. Check: ask Play Console support before registering
    the developer account.
-3. **Alerts are enough to reach 90%.** From 1 January 2027, banks may stop
-   SMS for payments of ₹500 or less, and HDFC Bank already stopped SMS for
+3. **Alerts are enough to reach 90%.** From 1 January 2027, commercial
+   banks may stop SMS for payments of ₹500 or less, and HDFC Bank already stopped SMS for
    small UPI payments in 2024, by a press report. Email alerts stay
    required wherever the customer gave an email address, so a bank that
    stops small SMS leaves the first success criterion resting on email

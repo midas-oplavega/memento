@@ -8,11 +8,12 @@ remembers, splits shared expenses with friends, and shows spending against a
 plan of where the money should go. In its local-only build, everything stays
 on the phone. Of the more than 20 products surveyed, the established Indian
 apps that capture payments automatically keep the data on their own
-servers; none describes a prompt at the moment of spending; and the only
-one that both captures automatically and splits bills with friends is
-closed source, paid, and declares that it collects SMS. The nearest open
-source apps appeared in October 2026. Its first user is its owner, who
-builds it for their own money.
+servers. Of those whose features the survey could check, none describes a
+prompt at the moment of spending, and the only one that both captures
+automatically and splits bills with friends is closed source, paid, and
+declares that it collects SMS. The nearest open source apps the survey
+found appeared in October 2026. Its first user is its owner, who builds it
+for their own money.
 
 ## Problem
 
@@ -108,10 +109,10 @@ meets the need in full.
   rather than Google Play, and neither describes a prompt at the moment of
   spending or splitting a bill with friends.
 
-No product read describes a prompt at the moment of spending. Of those
-read, the only one that both captures automatically and splits bills with
-friends is FinArt, which is closed, paid, and declares that it collects
-SMS.
+Of the products whose features the survey could check, none describes a
+prompt at the moment of spending, and the only one that both captures
+automatically and splits bills with friends is FinArt, which is closed,
+paid, and declares that it collects SMS.
 
 ## Goals
 
@@ -190,10 +191,11 @@ complies with a rule.
 ### Google Play: SMS capture
 
 Only the default SMS, phone or assistant app may ask for SMS permissions,
-unless Google grants a temporary exception. The one that fits Memento is "SMS-based money management", "For
-example, apps that track and manage budget", which covers READ_SMS and
-RECEIVE_SMS and is "Subject to Google Play review and approval". It is asked
-for with a Permissions Declaration Form and a demo video, and its review
+unless Google grants a temporary exception. The one that fits Memento is
+"SMS-based money management", "For example, apps that track and manage
+budget", which covers READ_SMS and RECEIVE_SMS and is "Subject to Google
+Play review and approval". It is asked for with a Permissions Declaration
+Form and a demo video, and its review
 "may require up to several weeks". SMS capture must be the app's core
 feature, promoted in its store description, and the app may not share a
 user's non-financial SMS
@@ -370,17 +372,19 @@ Riskiest first, each with the cheapest way to check it.
    can't read SMS, and capture rests on email, statements and typing.
    Several Indian SMS trackers are on Google Play: axio, which calls itself
    "an SMS-based money management app" and also uses the SMS permission
-   for loan fraud checks, and small ones such as PaisaSync. Whether Memento is granted the exception,
-   only its declaration settles. Check: submit the Permissions Declaration Form with
-   the first closed-test build, weeks before a public release.
+   for loan fraud checks, and small ones such as PaisaSync. Whether
+   Memento is granted the exception, only its declaration settles. Check:
+   submit the Permissions Declaration Form with the first closed-test
+   build, weeks before a public release.
 2. **An individual may publish it.** If Google counts a tracker as a
    "financial product or service", Google Play needs an organization
    account with a D-U-N-S number, and Apple's 5.1.1(ix) asks the same of
    the iPhone version. Check: ask Play Console support before registering
    the developer account.
 3. **Alerts are enough to reach 90%.** From 1 January 2027, commercial
-   banks may stop SMS for payments of ₹500 or less, and HDFC Bank already stopped SMS for
-   small UPI payments in 2024, by a press report. Email alerts stay
+   banks may stop SMS for payments of ₹500 or less, and HDFC Bank already
+   stopped SMS for small UPI payments in 2024, by a press report. Email
+   alerts stay
    required wherever the customer gave an email address, so a bank that
    stops small SMS leaves the first success criterion resting on email
    capture. Check: count one month of the owner's payments against the SMS

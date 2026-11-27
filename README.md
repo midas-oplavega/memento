@@ -24,7 +24,8 @@ forgotten the details.
 - **Automatic capture.** Detect transactions from bank SMS and email alerts,
   so nothing has to be typed in.
 - **A prompt at the moment of spending.** Notify as soon as a transaction is
-  detected, with one tap to add a note or split it.
+  detected, with one tap to add a note or split it, or once a day, for those
+  who prefer it.
 - **Multiple sources without duplicates.** Recognise when an SMS, an email
   and a statement line describe the same transaction.
 - **A plan to spend against.** Set a budget for each category of spending,

@@ -1,8 +1,8 @@
 # Memento
 
-Memento is an open source, privacy-first personal finance app for Android,
-for people in India whose money moves through several bank accounts, cards
-and UPI. It records each payment in and out from the bank's SMS and email
+Memento is an open source, privacy-first personal finance app, starting
+with Android and India, for people whose money moves through several bank
+accounts, cards and UPI. It records each payment in and out from the bank's SMS and email
 alerts as it arrives, asks what the payment was for while the user still
 remembers, splits shared expenses with friends, and shows spending against a
 plan of where the money should go. In its local-only build, everything stays
@@ -19,28 +19,17 @@ for their own money.
 
 Money moves through many channels: several bank accounts, credit and debit
 cards, UPI. Nothing shows in one place what came in and what went out. In
-October 2026, India made about 25.47 billion UPI payments, and about 12.7
-crore credit cards and 104 crore debit cards were outstanding
+October 2026, India made about 25.47 billion UPI payments
 ([survey](../research/existing-products.md#how-fragmented-an-indian-users-money-is)).
 
-The owner's own month shows what this costs. The salary is credited on one
-day. Over the days that follow, credit card bills, EMIs and everyday
-payments go out through different channels, and about two weeks later the
-money is gone and the owner can't say what it went on. The only way to find
-out is to go through bank and card statements months later, when most of
-the payments can no longer be remembered. Without knowing where the money
-went, there is nothing to plan the next month's spending from.
-
-Not every movement is spending or income. A friend paying back, a refund, a
-transfer between the owner's own accounts or a credit card bill payment is
-neither, and counting it as one gives the wrong picture.
-
-Shared expenses are one part of this. When the owner goes out with friends
-and pays, the expense isn't entered in a splitting app that day. It is
-sorted out months later, when nobody remembers the details.
-
-Today the owner manages by reading statements long after the month, and by
-entering shared expenses in Splitwise late.
+The owner's salary is gone about two weeks after it is credited, through
+card bills, EMIs and everyday payments, and the owner can't say what it went
+on. Finding out means reading statements months later, when the payments
+can no longer be remembered, so there is nothing to plan the next month
+from. A friend paying back, a refund, a transfer between the owner's own
+accounts or a card bill payment is neither spending nor income, and counting
+it as one gives the wrong picture. Shared expenses the owner pays for
+friends reach Splitwise months late, when nobody remembers the details.
 
 ## Users
 
@@ -121,7 +110,9 @@ paid, and declares that it collects SMS.
 - **Asked while they remember.** Within seconds of an SMS alert, a
   notification asks what the payment was for, with one tap to add a note, a
   category or a split. Email alerts are fetched from time to time rather
-  than pushed, so their prompt comes later.
+  than pushed, so their prompt comes later. A daily notification lists the
+  payments still without a note or category, and a user who wants only that
+  can switch the instant one off.
 - **Each payment once.** When an SMS, an email and a statement line report
   the same payment, it is recorded once.
 - **A true picture.** Transfers between the user's own accounts, credit card
@@ -183,160 +174,56 @@ After a month of the owner's own use:
 
 ## Constraints
 
-Each rule links the research note that quotes it, with the date it was
-read. What a source leaves unsettled is marked **Open**: the owner's
-question, which they may put to a lawyer. Nothing here says that Memento
-complies with a rule.
+Each rule is quoted, with the date it was read, in the research note it
+links. Nothing here says that Memento complies with a rule.
 
-### Google Play: SMS capture
+### Outside rules
 
-Only the default SMS, phone or assistant app may ask for SMS permissions,
-unless Google grants a temporary exception. The one that fits Memento is
-"SMS-based money management", "For example, apps that track and manage
-budget", which covers READ_SMS and RECEIVE_SMS and is "Subject to Google
-Play review and approval". It is asked for with a Permissions Declaration
-Form and a demo video, and its review
-"may require up to several weeks". SMS capture must be the app's core
-feature, promoted in its store description, and the app may not share a
-user's non-financial SMS
-([store rules](../research/store-and-platform-rules.md#1-google-play-sms-permission-groups)).
+| Rule | What it asks | What it governs |
+|---|---|---|
+| [Google Play: SMS permissions](../research/store-and-platform-rules.md#1-google-play-sms-permission-groups) | Google's "SMS-based money management" exception, after a declaration, a demo video and a review of up to several weeks. | SMS capture |
+| [Google Play: user data](../research/store-and-platform-rules.md#2-google-play-data-safety-section-and-privacy-policy) | A public privacy policy, linked in the app; the Data safety form; a disclosure in the app before a permission that reads data in the background. | The store listing and the app |
+| [Google Play: financial features](../research/store-and-platform-rules.md#3-google-play-financial-features-declaration) | Every app declares its financial features; the list has no entry for tracking. | The store listing |
+| [Google Play: developer accounts](../research/store-and-platform-rules.md#4-google-play-publishing-as-an-individual) | A closed test with 12 testers for 14 days, and an organization account for "Financial products and services". | Publishing |
+| [Android developer verification](../research/store-and-platform-rules.md#5-android-developer-verification) | From 2027, a registered developer for apps installed from outside Google Play. | Builds outside Google Play |
+| [Google app passwords](../research/store-and-platform-rules.md#7-google-app-passwords-email-capture-first-route) | 2-Step Verification; Google discourages them, and revokes them when the password changes. | Email capture |
+| [Gmail API](../research/store-and-platform-rules.md#8-gmail-api-restricted-scopes-possible-later-route) | Google's verification for a public release. | A later email route |
+| [Outlook.com](../research/store-and-platform-rules.md#9-outlookcom-imap-with-a-password) | OAuth2 for IMAP. | Email capture |
+| [Apple: guideline 5.1.1](../research/store-and-platform-rules.md#6-apple-app-review-guidelines-ios-later) | A privacy policy link; a finance app "should be submitted by a legal entity". | The iPhone version |
+| [India's data protection act](../research/indian-law.md#1-digital-personal-data-protection-act-2023-definitions-and-section-3) | It doesn't apply to data an individual processes "for any personal or domestic purpose". | All personal data |
+| [DPDP Rules, 2025](../research/indian-law.md#2-digital-personal-data-protection-rules-2025-notification-and-commencement) | A Data Fiduciary's duties, from about May 2027. | The cloud build |
+| [RBI: Account Aggregators](../research/indian-law.md#3-rbi-account-aggregator-framework) | Only regulated entities receive users' bank data. | Why capture reads alerts |
+| [RBI: transaction alerts](../research/indian-law.md#4-rbi-banks-sms-alerts-for-electronic-transactions) | From 1 January 2027, commercial banks must send SMS only for payments over ₹500, and email for every payment where the customer gave an address. | SMS and email capture |
+| [TRAI: SMS headers](../research/indian-law.md#5-trai-commercial-sms-headers-dlt-and-suffixes) | Commercial SMS come from registered headers marked by type, which doesn't prove the sender. | Recognising alerts |
 
-**Open:** whether Google grants it to Memento. Only a submission settles it:
-the first risk below.
-
-### Google Play: privacy policy and declarations
-
-Every app links a privacy policy in Play Console and inside the app, on a
-public web page, even one that collects no data. Data processed only on the
-phone need not be declared as collected on the Data safety form, but the
-form is still completed. Where the app reads personal data in a way the
-user may not expect, such as in the background, its permission request is
-preceded by a prominent disclosure in the app
-([store rules](../research/store-and-platform-rules.md#2-google-play-data-safety-section-and-privacy-policy)).
-Every app also completes the Financial features declaration, whose list has
-no entry for expense tracking
-([store rules](../research/store-and-platform-rules.md#3-google-play-financial-features-declaration)).
-
-**Open:** whether Memento declares "Other" or that it provides no financial
-features.
-
-### Google Play and Android: publishing as an individual
-
-A personal developer account created after 13 November 2023 runs a closed
-test with at least 12 testers for 14 days before it can publish. An
-organization account, which needs a D-U-N-S number, is required for
-"Financial products and services, including banking, loans, stock trading,
-investment funds, cryptocurrency software wallets, and cryptocurrency
-exchanges"
-([store rules](../research/store-and-platform-rules.md#4-google-play-publishing-as-an-individual)).
-Once Android's developer verification reaches India, due "globally ... in
-2027", an app installed from outside Google Play needs a registered
-developer, unless it is installed over ADB or the user turns on Android's
-advanced flow for unverified apps. Google Play registers most apps
-automatically
-([store rules](../research/store-and-platform-rules.md#5-android-developer-verification)).
-
-**Open:** whether Google counts a tracker that moves no money as a financial
-product or service: the second risk below.
-
-### Email providers: email capture
-
-- **Gmail over IMAP** with an app password needs 2-Step Verification.
-  Google gives work or school accounts, security-key-only 2-Step
-  Verification and Advanced Protection as reasons the option may be
-  missing. Google revokes app passwords when
-  the account password changes and says they "aren't recommended"; its
-  pages announce no removal
-  ([store rules](../research/store-and-platform-rules.md#7-google-app-passwords-email-capture-first-route)).
-- **Gmail through Google's API** with `gmail.readonly` is a restricted
-  scope: a public release needs Google's verification, while the
-  developer's own use, or fewer than 100 users, does not
-  ([store rules](../research/store-and-platform-rules.md#8-gmail-api-restricted-scopes-possible-later-route)).
-  **Open:** whether an app with no server also needs the yearly security
-  assessment; Google's pages disagree.
-- **Outlook.com** requires OAuth2 for IMAP; password sign-in ended on
-  16 September 2024
-  ([store rules](../research/store-and-platform-rules.md#9-outlookcom-imap-with-a-password)).
-
-### Apple: the iPhone version
-
-Every app links a privacy policy in App Store Connect and inside the app
-(guideline 5.1.1(i)). Apps "in highly regulated fields (such as banking and
-financial services ...) or that require sensitive user information should
-be submitted by a legal entity that provides the services, and not by an
-individual developer" (5.1.1(ix))
-([store rules](../research/store-and-platform-rules.md#6-apple-app-review-guidelines-ios-later)).
-
-**Open:** whether 5.1.1(ix) covers Memento.
-
-### Indian law: personal data
-
-India's Digital Personal Data Protection Act, 2023 does "not apply to ...
-personal data processed by an individual for any personal or domestic
-purpose". On its face that covers the user recording their own payments,
-and the names of the friends they split with
-([Indian law](../research/indian-law.md#1-digital-personal-data-protection-act-2023-definitions-and-section-3)).
-In the local-only build the developer receives no data.
-
-**Open:** whether writing the app a user runs makes the developer a "Data
-Fiduciary"; the Act doesn't say. The cloud build would hold friends' split
-records on a server the developer runs, and how the Act applies to that is
-a question for the change that adds it. The duties of the DPDP Rules, 2025
-on notice, safeguards, breaches, retention and people's rights come into
-force about May 2027
-([Indian law](../research/indian-law.md#2-digital-personal-data-protection-rules-2025-notification-and-commencement)).
-
-### Indian sector rules: what alerts exist
-
-- **No bank data route for an individual.** An Account Aggregator's data
-  user must be "registered with and regulated by any financial sector
-  regulator"
-  ([Indian law](../research/indian-law.md#3-rbi-account-aggregator-framework)).
-- **SMS alerts shrink from 2027.** Until 31 December 2026, commercial banks
-  must send an SMS for every electronic banking transaction. From
-  1 January 2027 they must send one only "for all EBTs of value more than
-  ₹500"; at or below that, each bank decides. They must send "email alerts
-  for all EBTs, wherever email address is provided by the customer"
-  ([Indian law](../research/indian-law.md#4-rbi-banks-sms-alerts-for-electronic-transactions)).
-  Email is the source the rules keep complete. Other kinds of bank, such as
-  small finance and co-operative banks, have rules of their own, which were
-  not read.
-- **SMS sender headers.** Commercial SMS come only from headers registered
-  with the telecom operators, suffixed "-T" for transactional, "-S" for
-  service, "-P" for promotional and "-G" for government messages. The
-  suffix helps tell an alert from a promotion; it doesn't prove which bank
-  sent it
-  ([Indian law](../research/indian-law.md#5-trai-commercial-sms-headers-dlt-and-suffixes)).
+**Open,** for the owner, who may put a question to a lawyer:
+- whether Google grants Memento the SMS exception: the first risk below;
+- whether Google Play, or Apple's guideline 5.1.1(ix), counts a tracker that
+  moves no money as a financial service: the second risk below;
+- whether Memento declares "Other" or no financial features;
+- whether a Gmail route with no server also needs Google's yearly security
+  assessment, on which Google's pages disagree;
+- whether writing an app that runs only on the user's phone makes the
+  developer a "Data Fiduciary", and how the act applies to the cloud
+  build's server;
+- the alert rules for banks other than commercial banks, which were not
+  read.
 
 ### Licences
 
-Memento is licensed AGPL-3.0-or-later: whoever distributes it offers its
-source under the same licence. The licences it may take in, proposed for
-the owner's decision ([licences](../research/licences.md)):
-- **Taken in:** MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC, Zlib,
-  MPL-2.0 unless marked "Incompatible With Secondary Licenses", and public
-  domain dedications: SQLite's (`blessing`), Unlicense and CC0-1.0. The FSF
-  lists each as compatible with the GNU GPL.
-- **Not taken in from others:** GPL, LGPL and AGPL code. The FSF reads
-  Apple's App Store terms as incompatible with every version of the GPL and
-  AGPL, and a post on its blog says the same of the LGPL, so code from
-  others under them would tie an iPhone release to its authors'
-  permission.
+Memento is licensed AGPL-3.0-or-later. Proposed for the owner's decision,
+it takes in code under MIT, BSD-2-Clause, BSD-3-Clause, Apache-2.0, ISC,
+Zlib, MPL-2.0 unless marked "Incompatible With Secondary Licenses", and
+public domain dedications: SQLite's (`blessing`), Unlicense and CC0-1.0. It
+takes in no GPL, LGPL or AGPL code from others: the FSF reads Apple's App
+Store terms as incompatible with them, which would tie an iPhone release to
+those authors' permission. Flutter (BSD-3-Clause), drift (MIT) and SQLite
+fit ([licences](../research/licences.md)).
 
-What Memento builds on fits: Flutter is BSD-3-Clause, drift is MIT, and
-SQLite is in the public domain
-([licences](../research/licences.md#2-licences-of-flutter-drift-and-sqlite)).
-
-**Open:**
-- Whether Memento's own AGPL code can ship through the App Store, with a
-  permission its sole author adds to the licence. No FSF source read says
-  so.
-- Whether it can ship through Google Play once it has other authors. A 2012
-  post on the FSF's blog says Google Play's terms "are incompatible with any
-  copyleft license if the project has many copyright holders". This bears
-  on accepting contributions.
-- Whether MPL-2.0 code can ship through the App Store. Apple's and Google's
-  current terms were not read.
+**Open:** whether Memento's own AGPL code can ship through the App Store,
+with a permission its sole author adds; whether Google Play's terms clash
+with copyleft once the project has many authors, as a 2012 FSF blog post
+says; and whether MPL-2.0 code can ship through the App Store.
 
 ### Security
 

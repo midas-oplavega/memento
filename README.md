@@ -24,9 +24,12 @@ forgotten the details.
 - **Automatic capture.** Detect transactions from bank SMS and email alerts,
   so nothing has to be typed in.
 - **A prompt at the moment of spending.** Notify as soon as a transaction is
-  detected, with one tap to add a note or split it.
+  detected, with one tap to add a note or split it, or once a day, for those
+  who prefer it.
 - **Multiple sources without duplicates.** Recognise when an SMS, an email
   and a statement line describe the same transaction.
+- **A plan to spend against.** Set a budget for each category of spending,
+  and see what has been spent against it as payments arrive.
 - **Splitting built in.** Split any transaction with friends, track balances
   and settle up, including partial settlements.
 - **Private by default.** The first release is local-only, and nothing leaves
@@ -47,6 +50,10 @@ own devices, a website and splits shared with friends.
 
 ## Documents
 
+- [Product brief](docs/product/brief.md): the problem Memento solves, for
+  whom, its goals, and the rules it works within.
+- [Research](docs/research/): the sources behind the brief, each with the
+  date it was read.
 - [Architecture decisions](docs/adr/): each choice that shapes the app, with
   its reasons.
 - [AGENTS.md](AGENTS.md): the rules for agents working on Memento.
